@@ -40,9 +40,9 @@ output_dir=$3
 if [ "$mode" == '--all' ]
 then
   rm -f $output_dir/small.zim
-  zimwriterfs --withoutFTIndex \
+  zimwriterfs --withoutFTIndex -z \
               -w main.html \
-              -f favicon.png \
+              -I favicon.png \
               -l en \
               -t "Test ZIM file" \
               -d "N/A" \
