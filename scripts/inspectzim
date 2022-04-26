@@ -71,6 +71,7 @@ dump_cluser_table()
   hexdump -s$((cluster_ptr_pos)) \
           -n$((8*cluster_count)) \
           -e '1/4 "0x%08x+" 1/4 "0x%08x00000000" "\n"' \
+          -v \
           "$zimfile"|restore_64bit_integers
   printf "\n"
 }
@@ -81,6 +82,7 @@ dump_dirent_ptr_table()
   hexdump -s$((url_ptr_pos)) \
           -n$((8*article_count)) \
           -e '1/4 "0x%08x+" 1/4 "0x%08x00000000" "\n"' \
+          -v \
           "$zimfile"|restore_64bit_integers
   printf "\n"
 }
@@ -91,6 +93,7 @@ dump_title_index()
   hexdump -s$((title_ptr_pos)) \
           -n$((4*article_count)) \
           -e '1/4 "%u" "\n"' \
+          -v \
           "$zimfile"
   printf "\n"
 }
