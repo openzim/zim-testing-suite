@@ -64,6 +64,26 @@ printf "BEGINZIM" > small.zim.embedded \
 
 zimfilesize=$(wc -c < small.zim)
 
+printf "BEGINZIMMULTIPART" > small.zim.embedded.multi \
+|| die 'Failed to create small.zim.embedded.multi'
+towrite=$zimfilesize
+skip=0
+while [ $towrite -gt 2048 ]
+do
+  dd bs=1 skip=${skip} count=2048 conv=notrunc if=small.zim of=small.zim.embedded.multi oflag=append 2>/dev/null \
+  || die 'Failed to create small.zim.embedded.multi'
+  printf "NEWSECTIONZIMMULTI" >> small.zim.embedded.multi \
+  || die 'Failed to create small.zim.embedded.multi'
+  skip=$(( $skip + 2048 ))
+  towrite=$(( $towrite - 2048 ))
+done
+dd bs=1 skip=${skip} count=${towrite} conv=notrunc if=small.zim of=small.zim.embedded.multi oflag=append 2>/dev/null \
+|| die 'Failed to create small.zim.embedded.multi'
+printf "ENDZIMMULTIPART" >> small.zim.embedded.multi \
+|| die 'Failed to create small.zim.embedded.multi'
+
+echo 'small.zim.embedded.multi was successfully created'
+
 zimheader=$($scriptdir/inspectzim --header small.zim|tail -n +2)
 
 encode_integer_as_printf_fmt_string()
