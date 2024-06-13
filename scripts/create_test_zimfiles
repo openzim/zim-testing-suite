@@ -204,6 +204,16 @@ create_broken_zim_file invalid.outofbounds_first_clusterptr.zim   \
                        "$outofzimfile" \
                        $((cluster_ptr_pos))
 
+cluster_ptrs=($($scriptdir/inspectzim --cluster_table small.zim|tail -n +2))
+
+# Second cluster is not compressed
+cluster_address=$((cluster_ptrs[1]))
+echo "cluster address is $cluster_address"
+
+create_broken_zim_file invalid.offset_in_cluster.zim \
+                       '\xFF\xFF\xFF\xFF' \
+                       $((cluster_address+5))
+
 dirent_ptrs=($($scriptdir/inspectzim --dirent_ptr_table small.zim|tail -n +2))
 
 dirent1_address=$(encode_uint64 $((dirent_ptrs[0])))
