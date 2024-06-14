@@ -1,0 +1,34 @@
+name: On-Release
+
+on:
+  release:
+    types: [released]
+
+permissions:
+  contents: write
+
+jobs:
+  create-archive:
+    name: create-archive
+    needs: ['create-release']
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        format: [zip, tar.gz]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create archive
+        shell: bash
+        env:
+          format: ${{ matrix.format }}
+        run: |
+          archive_name="zim-testing-suite-${{ github.ref_name }}"
+          git archive --prefix="${archive_name}/" --output ${archive_name}.${{ env.format }} ${{ github.ref_name }}:data/
+
+      - name: Upload archive
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          format: ${{ matrix.format }}
+        run: |
+          archive="zim-testing-suite-${{ github.ref_name }}.${{ env.format }}"
+          gh release upload "${{ github.ref_name }}" $archive
