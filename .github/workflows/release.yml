@@ -1,0 +1,58 @@
+name: On-Release
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+'
+      - '[0-9]+.[0-9]+-[0-9a-zA-Z]+'
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    name: create-release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get release version from tag
+        if: env.VERSION == ''
+        run: |
+          echo "VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
+      - name: Show the version
+        run: |
+          echo "Version is: $VERSION"
+      - name: Create Github release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create $VERSION --draft --verify-tag --title v$VERSION
+    outputs:
+      version: ${{ env.VERSION }}
+
+  create-archive:
+    name: create-archive
+    needs: ['create-release']
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        format: [zip, tar.gz]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create archive
+        shell: bash
+        env:
+          format: ${{ matrix.format }}
+        run: |
+          version="${{ needs.create-release.outputs.version }}"
+          archive_name="zim-testing-suite-${version}"          
+          git archive --prefix="${archive_name}/" --output ${archive_name}.${{ env.format }} ${version}:data/
+
+      - name: Upload archive
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          format: ${{ matrix.format }}
+        run: |
+          version="${{ needs.create-release.outputs.version }}"
+          archive="zim-testing-suite-${version}.${{ env.format }}"
+          gh release upload "v$version" $archive
