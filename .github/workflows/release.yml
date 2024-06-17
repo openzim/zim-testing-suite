@@ -10,7 +10,6 @@ permissions:
 jobs:
   create-archive:
     name: create-archive
-    needs: ['create-release']
     runs-on: ubuntu-latest
     strategy:
       matrix:
