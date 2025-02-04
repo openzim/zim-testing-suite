@@ -220,23 +220,26 @@ title_index=($($scriptdir/inspectzim --title_index small.zim|tail -n +2))
 title1_dirent_index=$(encode_uint32 $((title_index[0])))
 title2_dirent_index=$(encode_uint32 $((title_index[1])))
 
-create_broken_zim_file invalid.outofbounds_first_title_entry.zim   \
-                       "$bad_article_index" \
-                       $((title_ptr_pos))
+if [[ $title_ptr_pos != 0 ]]
+then
+  create_broken_zim_file invalid.outofbounds_first_title_entry.zim   \
+                         "$bad_article_index" \
+                         $((title_ptr_pos))
 
-create_broken_zim_file invalid.outofbounds_last_title_entry.zim   \
-                       "$bad_article_index" \
-                       $((title_ptr_pos+4*(article_count-1)))
+  create_broken_zim_file invalid.outofbounds_last_title_entry.zim   \
+                         "$bad_article_index" \
+                         $((title_ptr_pos+4*(article_count-1)))
 
-create_broken_zim_file invalid.outofbounds_titleptrpos.zim   \
-                       "$outofzimfile" \
-                       40
+  create_broken_zim_file invalid.outofbounds_titleptrpos.zim   \
+                         "$outofzimfile" \
+                         40
 
-create_broken_zim_file invalid.nonsorted_title_index.zim   \
-                       "$title2_dirent_index" \
-                       $((title_ptr_pos))   \
-                       "$title1_dirent_index" \
-                       $((title_ptr_pos+4))
+  create_broken_zim_file invalid.nonsorted_title_index.zim   \
+                         "$title2_dirent_index" \
+                         $((title_ptr_pos))   \
+                         "$title1_dirent_index" \
+                         $((title_ptr_pos+4))
+fi
 
 bad_mimetype_list=$(printf '%-1968s' 'This is a bad mimetype value filling all the space between the header and the first cluster without any null character')
 create_broken_zim_file invalid.bad_mimetype_list.zim   \
