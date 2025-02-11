@@ -40,10 +40,11 @@ output_dir=$3
 if [ "$mode" == '--all' ]
 then
   rm -f $output_dir/small.zim
-  zimwriterfs --withoutFTIndex -z \
+  zimwriterfs --withoutFTIndex \
               -w main.html \
               -I favicon.png \
-              -l en \
+              -l eng \
+              -n "Test ZIM file" \
               -t "Test ZIM file" \
               -d "N/A" \
               -c "N/A" \
@@ -162,9 +163,6 @@ create_broken_zim_file invalid.outofbounds_urlptrpos.zim   \
                        "$outofzimfile" \
                        32
 
-create_broken_zim_file invalid.outofbounds_titleptrpos.zim   \
-                       "$outofzimfile" \
-                       40
 
 create_broken_zim_file invalid.outofbounds_clusterptrpos.zim   \
                        "$outofzimfile" \
@@ -191,14 +189,6 @@ create_broken_zim_file invalid.outofbounds_first_direntptr.zim   \
 create_broken_zim_file invalid.outofbounds_last_direntptr.zim   \
                        "$outofzimfile" \
                        $((url_ptr_pos+8*(article_count-1)))
-
-create_broken_zim_file invalid.outofbounds_first_title_entry.zim   \
-                       "$bad_article_index" \
-                       $((title_ptr_pos))
-
-create_broken_zim_file invalid.outofbounds_last_title_entry.zim   \
-                       "$bad_article_index" \
-                       $((title_ptr_pos+4*(article_count-1)))
 
 create_broken_zim_file invalid.outofbounds_first_clusterptr.zim   \
                        "$outofzimfile" \
@@ -230,13 +220,28 @@ title_index=($($scriptdir/inspectzim --title_index small.zim|tail -n +2))
 title1_dirent_index=$(encode_uint32 $((title_index[0])))
 title2_dirent_index=$(encode_uint32 $((title_index[1])))
 
-create_broken_zim_file invalid.nonsorted_title_index.zim   \
-                       "$title2_dirent_index" \
-                       $((title_ptr_pos))   \
-                       "$title1_dirent_index" \
-                       $((title_ptr_pos+4))
+if [[ $title_ptr_pos != 0 ]]
+then
+  create_broken_zim_file invalid.outofbounds_first_title_entry.zim   \
+                         "$bad_article_index" \
+                         $((title_ptr_pos))
 
-bad_mimetype_list=$(printf '%-944s' 'This is a bad mimetype value filling all the space between the header and the first cluster without any null character')
+  create_broken_zim_file invalid.outofbounds_last_title_entry.zim   \
+                         "$bad_article_index" \
+                         $((title_ptr_pos+4*(article_count-1)))
+
+  create_broken_zim_file invalid.outofbounds_titleptrpos.zim   \
+                         "$outofzimfile" \
+                         40
+
+  create_broken_zim_file invalid.nonsorted_title_index.zim   \
+                         "$title2_dirent_index" \
+                         $((title_ptr_pos))   \
+                         "$title1_dirent_index" \
+                         $((title_ptr_pos+4))
+fi
+
+bad_mimetype_list=$(printf '%-1968s' 'This is a bad mimetype value filling all the space between the header and the first cluster without any null character')
 create_broken_zim_file invalid.bad_mimetype_list.zim   \
                        "$bad_mimetype_list" \
                        80
