@@ -215,13 +215,13 @@ create_broken_zim_file invalid.nonsorted_dirent_table.zim   \
                        "$dirent1_address" \
                        $((url_ptr_pos+8))
 
-title_index=($($scriptdir/inspectzim --title_index small.zim|tail -n +2))
-
-title1_dirent_index=$(encode_uint32 $((title_index[0])))
-title2_dirent_index=$(encode_uint32 $((title_index[1])))
-
-if [[ $title_ptr_pos != 0 ]]
+if [[ $title_ptr_pos != 0xffffffffffffffff ]]
 then
+  title_index=($($scriptdir/inspectzim --title_index small.zim|tail -n +2))
+
+  title1_dirent_index=$(encode_uint32 $((title_index[0])))
+  title2_dirent_index=$(encode_uint32 $((title_index[1])))
+
   create_broken_zim_file invalid.outofbounds_first_title_entry.zim   \
                          "$bad_article_index" \
                          $((title_ptr_pos))
