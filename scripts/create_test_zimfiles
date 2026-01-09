@@ -200,6 +200,34 @@ cluster_ptrs=($($scriptdir/inspectzim --cluster_table small.zim|tail -n +2))
 cluster_address=$((cluster_ptrs[1]))
 echo "cluster address is $cluster_address"
 
+create_broken_zim_file invalid.too_small_offset_of_first_blob_in_cluster_0.zim \
+                       '\x00\x00\x00\x00' \
+                       $((cluster_address+1))
+
+create_broken_zim_file invalid.too_small_offset_of_first_blob_in_cluster_4.zim \
+                       '\x04\x00\x00\x00' \
+                       $((cluster_address+1))
+
+create_broken_zim_file invalid.too_small_offset_of_first_blob_in_cluster_7.zim \
+                       '\x07\x00\x00\x00' \
+                       $((cluster_address+1))
+
+create_broken_zim_file invalid.misaligned_offset_of_first_blob_in_cluster_9.zim \
+                       '\x09\x00\x00\x00' \
+                       $((cluster_address+1))
+
+create_broken_zim_file invalid.misaligned_offset_of_first_blob_in_cluster_10.zim \
+                       '\x0a\x00\x00\x00' \
+                       $((cluster_address+1))
+
+create_broken_zim_file invalid.misaligned_offset_of_first_blob_in_cluster_11.zim \
+                       '\x0b\x00\x00\x00' \
+                       $((cluster_address+1))
+
+create_broken_zim_file invalid.too_large_offset_of_first_blob_in_cluster.zim \
+                       $(encode_uint32 $((4*(article_count+2)))) \
+                       $((cluster_address+1))
+
 create_broken_zim_file invalid.offset_in_cluster.zim \
                        '\xFF\xFF\xFF\xFF' \
                        $((cluster_address+5))
