@@ -212,6 +212,18 @@ create_broken_zim_file invalid.too_small_offset_of_first_blob_in_cluster_7.zim \
                        '\x07\x00\x00\x00' \
                        $((cluster_address+1))
 
+create_broken_zim_file invalid.misaligned_offset_of_first_blob_in_cluster_9.zim \
+                       '\x09\x00\x00\x00' \
+                       $((cluster_address+1))
+
+create_broken_zim_file invalid.misaligned_offset_of_first_blob_in_cluster_10.zim \
+                       '\x0a\x00\x00\x00' \
+                       $((cluster_address+1))
+
+create_broken_zim_file invalid.misaligned_offset_of_first_blob_in_cluster_11.zim \
+                       '\x0b\x00\x00\x00' \
+                       $((cluster_address+1))
+
 create_broken_zim_file invalid.offset_in_cluster.zim \
                        '\xFF\xFF\xFF\xFF' \
                        $((cluster_address+5))
