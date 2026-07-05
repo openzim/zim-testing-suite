@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+compute_zim_checksum()
+{
+    local zimfilepath=$1
+    local n=$(cat "$zimfilepath"|wc -c)
+    head -c $((n-16)) "$zimfilepath"|md5sum|cut -d' ' -f 1
+}
+
+overwrite_bytes_in_file()
+{
+  local fname=$1
+  local bytes=$2
+  local offset=$3
+  local nbytes=$(printf "$bytes"|wc -c)
+  printf "$bytes" |
+    dd of="$fname" bs=1 seek=$offset count=$nbytes conv=notrunc &> /dev/null
+}
+
+set_zimfile_checksum()
+{
+    local zimfilepath=$1
+    local checksum_str=$2
+    local n=$(cat "$zimfilepath"|wc -c)
+    checksum_str=$(sed 's/\(..\)/\\x\1/g'<<<"$checksum_str")
+    overwrite_bytes_in_file "$zimfilepath" "$checksum_str" $((n-16))
+}
+
+checksum_hexstr=$(compute_zim_checksum "$1")
+echo "Setting checksum of file '$1' to $checksum_hexstr"
+set_zimfile_checksum "$1" "$checksum_hexstr"
